@@ -35,32 +35,34 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $errors['phone'] = 'phone должен содержать больше 2-х символов';
     }
     if (empty($errors)) {
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
-
-
         $name = $_POST['name'];
-
         $email = $_POST['email'];
-
         $phone = $_POST['phone'];
 
         $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
         $phone = password_hash($phone, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
-        $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone]);
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
+        $stmt->execute(['email' => $email]);
+        $userData = $stmt->fetch();
+        if (!empty($userData)) {
+            $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
+        } else {
+            $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
+            $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone]);
 
-        $stmt = $conn->prepare("SELECT * FROM users WHERE name = :name");
-        $stmt->execute(['name' => $name]);
-        $dbinfo = $stmt->fetch();
-        print_r('id - ' . $dbinfo['id']);
-        echo '<br>';
-        print_r('name - ' . $dbinfo['name']);
-        echo '<br>';
-        print_r('email - ' . $dbinfo['email']);
-        echo '<br>';
-        print_r('phone - ' . $dbinfo['phone']);
+            $stmt = $conn->prepare("SELECT * FROM users WHERE name = :name");
+            $stmt->execute(['name' => $name]);
+            $dbinfo = $stmt->fetch();
+
+            print_r('id - ' . $dbinfo['id']);
+            echo '<br>';
+            print_r('name - ' . $dbinfo['name']);
+            echo '<br>';
+            print_r('email - ' . $dbinfo['email']);
+            echo '<br>';
+            print_r('phone - ' . $dbinfo['phone']);
+        }
 
 
     }
