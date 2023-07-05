@@ -1,39 +1,41 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    $errors = [];
-    if (!isset($_POST['name'])) {
-        $errors['name'] = 'name is required';
-    }
-    $name = $_POST['name'];
-    if (empty($name)) {
-        $errors['name'] = 'name не может быть пустым';
-    }
-    if (strlen($name) < 2) {
-        $errors['name'] = 'name должен содержать больше 2-х символов';
+
+    function isValid($name, $email, $phone): array
+    {
+        $errors = [];
+
+        if (!isset($name)) {
+            $errors[$name] = 'name is required';
+        } elseif (strlen($name) < 2) {
+            $errors['name'] = 'name должен содержать больше 2-х символов';
+        }
+        elseif (!isset($email)){
+            $errors[$email] = 'email is required';
+        } elseif (empty($email)){
+            $errors[$email] = 'email не может быть пустым';
+        } elseif (strlen($email) < 2){
+            $errors['email'] = 'email должен содержать больше 2-х символов';
+        }
+        elseif (!isset($phone)){
+            $errors['psw'] = 'password is required';
+        } elseif (empty($phone)){
+            $errors['phone'] = 'phone не может быть пустым';
+        } elseif (strlen($phone) < 2){
+            $errors['phone'] = 'phone должен содержать больше 2-х символов';
+        }
+        $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
+        $stmt->execute(['email' => $email]);
+        $userData = $stmt->fetch();
+        if (!empty($userData)) {
+            $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
+        }
+        return $errors;
     }
 
-    if (!isset($_POST['email'])) {
-        $errors['email'] = 'email is required';
-    }
-    $email = $_POST['email'];
+    $errors = isValid($_POST['name'], $_POST['email'], $_POST['phone']);
 
-    if (empty($email)) {
-        $errors['email'] = 'email не может быть пустым';
-    }
-    if (strlen($email) < 2) {
-        $errors['email'] = 'email должен содержать больше 2-х символов';
-    }
-
-    if (!isset($_POST['phone'])) {
-        $errors['psw'] = 'password is required';
-    }
-    $phone = $_POST['phone'];
-    if (empty($phone)) {
-        $errors['phone'] = 'phone не может быть пустым';
-    }
-    if (strlen($phone) < 2) {
-        $errors['phone'] = 'phone должен содержать больше 2-х символов';
-    }
     if (empty($errors)) {
         $name = $_POST['name'];
         $email = $_POST['email'];
@@ -42,30 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
         $phone = password_hash($phone, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
-        $stmt->execute(['email' => $email]);
-        $userData = $stmt->fetch();
-        if (!empty($userData)) {
-            $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
-        } else {
-            $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
-            $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone]);
+        $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
+        $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone]);
 
-            $stmt = $conn->prepare("SELECT * FROM users WHERE name = :name");
-            $stmt->execute(['name' => $name]);
-            $dbinfo = $stmt->fetch();
+        $stmt = $conn->prepare("SELECT * FROM users WHERE name = :name");
+        $stmt->execute(['name' => $name]);
+        $dbinfo = $stmt->fetch();
 
-            print_r('id - ' . $dbinfo['id']);
-            echo '<br>';
-            print_r('name - ' . $dbinfo['name']);
-            echo '<br>';
-            print_r('email - ' . $dbinfo['email']);
-            echo '<br>';
-            print_r('phone - ' . $dbinfo['phone']);
+        print_r('id - ' . $dbinfo['id']);
+        echo '<br>';
+        print_r('name - ' . $dbinfo['name']);
+        echo '<br>';
+        print_r('email - ' . $dbinfo['email']);
+        echo '<br>';
+        print_r('phone - ' . $dbinfo['phone']);
         }
 
-
-    }
 }
 
 ?>
