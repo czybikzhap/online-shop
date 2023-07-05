@@ -1,47 +1,13 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-
-    function isValid($name, $email, $phone): array
-    {
-        $errors = [];
-
-        if (!isset($name)) {
-            $errors[$name] = 'name is required';
-        } elseif (strlen($name) < 2) {
-            $errors['name'] = 'name должен содержать больше 2-х символов';
-        }
-        elseif (!isset($email)){
-            $errors[$email] = 'email is required';
-        } elseif (empty($email)){
-            $errors[$email] = 'email не может быть пустым';
-        } elseif (strlen($email) < 2){
-            $errors['email'] = 'email должен содержать больше 2-х символов';
-        }
-        elseif (!isset($phone)){
-            $errors['psw'] = 'password is required';
-        } elseif (empty($phone)){
-            $errors['phone'] = 'phone не может быть пустым';
-        } elseif (strlen($phone) < 2){
-            $errors['phone'] = 'phone должен содержать больше 2-х символов';
-        }
-        $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
-        $stmt->execute(['email' => $email]);
-        $userData = $stmt->fetch();
-        if (!empty($userData)) {
-            $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
-        }
-        return $errors;
-    }
-
-    $errors = isValid($_POST['name'], $_POST['email'], $_POST['phone']);
+    $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
+    $errors = isValid($_POST, $conn);
 
     if (empty($errors)) {
         $name = $_POST['name'];
         $email = $_POST['email'];
         $phone = $_POST['phone'];
 
-        $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
         $phone = password_hash($phone, PASSWORD_DEFAULT);
 
         $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
@@ -60,6 +26,42 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         print_r('phone - ' . $dbinfo['phone']);
         }
 
+}
+
+function isValid(array $data, PDO $conn): array
+{
+    $errors = [];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+
+    if (!isset($name)) {
+        $errors[$name] = 'name is required';
+    } elseif (strlen($name) < 2) {
+        $errors['name'] = 'name должен содержать больше 2-х символов';
+    }
+    elseif (!isset($email)){
+        $errors[$email] = 'email is required';
+    } elseif (empty($email)){
+        $errors[$email] = 'email не может быть пустым';
+    } elseif (strlen($email) < 2){
+        $errors['email'] = 'email должен содержать больше 2-х символов';
+    }
+    elseif (!isset($phone)){
+        $errors['psw'] = 'password is required';
+    } elseif (empty($phone)){
+        $errors['phone'] = 'phone не может быть пустым';
+    } elseif (strlen($phone) < 2){
+        $errors['phone'] = 'phone должен содержать больше 2-х символов';
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
+    $stmt->execute(['email' => $email]);
+    $userData = $stmt->fetch();
+    if (!empty($userData)) {
+        $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
+    }
+    return $errors;
 }
 
 ?>
