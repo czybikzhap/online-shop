@@ -6,12 +6,13 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (empty($errors)) {
         $name = $_POST['name'];
         $email = $_POST['email'];
-        $phone = $_POST['phone'];
+        $password = $_POST['password'];
+        $repeat_pwd = $_POST['repeat_pwd'];
 
-        $phone = password_hash($phone, PASSWORD_DEFAULT);
+        $password = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO users (name, email, phone) VALUES (:name, :email, :phone)");
-        $stmt->execute(['name' => $name, 'email' => $email, 'phone' => $phone]);
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
+        $stmt->execute(['name' => $name, 'email' => $email, 'password' => $password]);
 
         $stmt = $conn->prepare("SELECT * FROM users WHERE name = :name");
         $stmt->execute(['name' => $name]);
@@ -23,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         echo '<br>';
         print_r('email - ' . $dbinfo['email']);
         echo '<br>';
-        print_r('phone - ' . $dbinfo['phone']);
+        print_r('password - ' . $dbinfo['password']);
         }
 
 }
@@ -33,7 +34,8 @@ function isValid(array $data, PDO $conn): array
     $errors = [];
     $name = $data['name'];
     $email = $data['email'];
-    $phone = $data['phone'];
+    $password = $data['password'];
+    $repeat_pwd = $data['repeat_pwd'];
 
     if (!isset($name)) {
         $errors[$name] = 'name is required';
@@ -47,12 +49,15 @@ function isValid(array $data, PDO $conn): array
     } elseif (strlen($email) < 2){
         $errors['email'] = 'email должен содержать больше 2-х символов';
     }
-    elseif (!isset($phone)){
-        $errors['psw'] = 'password is required';
-    } elseif (empty($phone)){
-        $errors['phone'] = 'phone не может быть пустым';
-    } elseif (strlen($phone) < 2){
-        $errors['phone'] = 'phone должен содержать больше 2-х символов';
+    elseif (!isset($password)){
+        $errors['password'] = 'password is required';
+    } elseif (empty($password)){
+        $errors['password'] = 'password не может быть пустым';
+    } elseif (strlen($password) < 2){
+        $errors['password'] = 'password должен содержать больше 2-х символов';
+    }
+    elseif ($password !== $repeat_pwd){
+        $errors['repeat_pwd'] = 'пароли не совадают';
     }
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
@@ -141,20 +146,21 @@ function isValid(array $data, PDO $conn): array
         }
         ?></label>
     <input type="email" id="email" name="email" required>
-    <label for="phone">Phone Number:</label>
+    <label for="password">Password:</label>
     <label style="color:red"><?php
-        if (isset ($errors['phone'])) {
-            echo $errors['phone'];
+        if (isset ($errors['password'])) {
+            echo $errors['password'];
         }
         ?></label>
-    <input type="tel" id="phone" name="phone" required>
-    <label for="position">Position Applied:</label>
-    <select id="position" name="position" required>
-        <option value="">Select Position</option>
-        <option value="frontend-developer">Frontend Developer</option>
-        <option value="backend-developer">Backend Developer</option>
-        <option value="graphic-designer">Graphic Designer</option>
-    </select>
+    <input type="password" id="userPassword" name="password" required>
+    <label for="userPassword">Repeat Password:</label>
+    <label style="color:red"><?php
+        if (isset ($errors['repeat_pwd'])) {
+            echo $errors['repeat_pwd'];
+        }
+        ?></label>
+    <input type="password" id="userPassword" name="repeat_pwd" required>
+    <label><?php echo '<br>'; ?></label>
     <input type="submit" value="Submit Application">
 </form>
 </body>
