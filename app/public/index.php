@@ -31,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 function isValid(array $data, PDO $conn): array
 {
     $errors = [];
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone'];
+    $name = $data['name'];
+    $email = $data['email'];
+    $phone = $data['phone'];
 
     if (!isset($name)) {
         $errors[$name] = 'name is required';
