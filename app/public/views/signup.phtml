@@ -69,21 +69,21 @@
     <input type="text" id="name" name="name" required>
     <label for="email">Email Address:</label>
     <label style="color:red"><?php
-        if (!isset ($errors['email'])) {
+        if (isset ($errors['email'])) {
             echo $errors['email'];
         }
         ?></label>
     <input type="email" id="email" name="email" required>
     <label for="password">Password:</label>
     <label style="color:red"><?php
-        if (!isset ($errors['password'])) {
+        if (isset ($errors['password'])) {
             echo $errors['password'];
         }
         ?></label>
     <input type="password" id="password" name="password" required>
     <label for="userPassword">Repeat Password:</label>
     <label style="color:red"><?php
-        if (!isset ($errors['repeat_pwd'])) {
+        if (isset ($errors['repeat_pwd'])) {
             echo $errors['repeat_pwd'];
         }
         ?></label>

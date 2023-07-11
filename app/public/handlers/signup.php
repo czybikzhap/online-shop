@@ -75,7 +75,7 @@ function isValidSignUp(array $data, PDO $conn): array
         }
     }
 
-    if (!isset($repeat_pwd)){
+    if (!isset($data['repeat_pwd'])){
         $errors['repeat_pwd'] = 'password is required';
     } else {
         $repeat_pwd = $data['repeat_pwd'];

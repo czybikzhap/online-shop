@@ -1,4 +1,24 @@
 <?php
+
+if ($_SERVER['REQUEST_METHOD'] === "POST") {
+    $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
+
+    $email = $_POST['email'];
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    $dbinfo = $stmt->fetch();
+    $hash = $_POST['password'];
+
+    $errors = isValidLogin($_POST, $conn);
+    if (!empty($dbinfo['email']) and !(password_verify($dbinfo['password'], $hash))) {
+        session_start();
+        $_SESSION['id'] = ['id' => $dbinfo['id']];
+        header('Location:./main');
+    } else {
+        $errors['password'] = 'неверное имя пользователя или пароль';
+    }
+
+}
 function isValidLogin(array $data, PDO $conn): array
 {
     $errors = [];
@@ -22,23 +42,4 @@ function isValidLogin(array $data, PDO $conn): array
     return $errors;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
-
-    $email = $_POST['email'];
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->execute(['email' => $email]);
-    $dbinfo = $stmt->fetch();
-    $hash = $_POST['password'];
-
-    $errors = isValidLogin($_POST, $conn);
-    if (!empty($dbinfo['email']) and !(password_verify($dbinfo['password'], $hash))) {
-        session_start();
-        $_SESSION['user'] = ['email' => $dbinfo['email']];
-        header('Location:./main');
-    } else {
-        $errors['password'] = 'неверное имя пользователя или пароль';
-    }
-
-}
 require_once './views/login.phtml';
