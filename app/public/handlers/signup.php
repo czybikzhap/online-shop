@@ -1,59 +1,4 @@
 <?php
-function isValidSignUp(array $data, PDO $conn): array
-{
-    $errors = [];
-
-    if (isset($name)) {
-        $errors['name'] = 'name is required';
-    }
-    $name = $data['name'];
-    if (empty($name)){
-        $errors['name'] = 'email не может быть пустым';
-    }
-    if (strlen($name) < 2) {
-        $errors['name'] = 'name должен содержать больше 2-х символов';
-    }
-
-    if (isset($email)){
-        $errors['email'] = 'email is required';
-    }
-    $email = $data['email'];
-    if (empty($email)){
-        $errors['email'] = 'email не может быть пустым';
-    }
-    if (strlen($email) < 2){
-        $errors['email'] = 'email должен содержать больше 2-х символов';
-    }
-
-    if (isset($password)){
-        $errors['password'] = 'password is required';
-    }
-    $password = $data['password'];
-    if (empty($password)){
-        $errors['password'] = 'password не может быть пустым';
-    }
-    if (strlen($password) < 2){
-        $errors['password'] = 'password должен содержать больше 2-х символов';
-    }
-    if (isset($repeat_pwd)){
-        $errors['repeat_pwd'] = 'password is required';
-    }
-    $repeat_pwd = $data['repeat_pwd'];
-    if (empty($repeat_pwd)){
-        $errors['repeat_pwd'] = 'password не может быть пустым';
-    }
-    if ($password !== $repeat_pwd){
-        $errors['repeat_pwd'] = 'пароли не совадают';
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
-    $stmt->execute(['email' => $email]);
-    $userData = $stmt->fetch();
-    if (!empty($userData)) {
-        $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
-    }
-    return $errors;
-}
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
@@ -82,6 +27,63 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         echo '<br>';
         print_r('password - ' . $dbinfo['password']);
     }
-
 }
-require_once './views/signup.html';
+
+require_once './views/signup.phtml';
+function isValidSignUp(array $data, PDO $conn): array
+{
+    $errors = [];
+
+    if (!isset($data['name'])) {
+        $errors['name'] = 'name is required';
+    } else {
+        $name = $data['name'];
+        if (empty($name)) {
+            $errors['name'] = 'name не может быть пустым';
+        } elseif (strlen($name) < 2) {
+            $errors['name'] = 'name должен содержать больше 2-х символов';
+        }
+    }
+
+
+    if (!isset($data['email'])){
+        $errors['email'] = 'email is required';
+    } else {
+        $email = $data['email'];
+        if (empty($email)){
+            $errors['email'] = 'email не может быть пустым';
+        } elseif (strlen($email) < 2) {
+            $errors['email'] = 'email должен содержать больше 2-х символов';
+        } else {
+            $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
+            $stmt->execute(['email' => $email]);
+            $userData = $stmt->fetch();
+            if (!empty($userData['email'])) {
+                $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
+            }
+        }
+    }
+
+    if (!isset($data['password'])){
+        $errors['password'] = 'password is required';
+    } else {
+        $password = $data['password'];
+        if (empty($password)) {
+            $errors['password'] = 'password не может быть пустым';
+        } elseif (strlen($password) < 2) {
+            $errors['password'] = 'password должен содержать больше 2-х символов';
+        }
+    }
+
+    if (!isset($repeat_pwd)){
+        $errors['repeat_pwd'] = 'password is required';
+    } else {
+        $repeat_pwd = $data['repeat_pwd'];
+        if (empty($repeat_pwd)) {
+            $errors['repeat_pwd'] = 'password не может быть пустым';
+        } elseif ($repeat_pwd !== $data['password']) {
+            $errors['repeat_pwd'] = 'пароли не совадают';
+        }
+    }
+    return $errors;
+}
