@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $hash = $_POST['password'];
 
     $errors = isValidLogin($_POST, $conn);
-    if (!empty($dbinfo['email']) and !(password_verify($dbinfo['password'], $hash))) {
+    if (!empty($dbinfo['email']) && !(password_verify($dbinfo['password'], $hash))) {
         session_start();
         $_SESSION['id'] = ['id' => $dbinfo['id']];
         header('Location:./main');

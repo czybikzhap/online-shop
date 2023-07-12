@@ -2,9 +2,13 @@
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
+
     $errors = isValidSignUp($_POST, $conn);
 
     if (empty($errors)) {
+        session_start();
+        header('Location: /login');
+
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = $_POST['password'];
@@ -29,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     }
 }
 
-require_once './views/signup.phtml';
 function isValidSignUp(array $data, PDO $conn): array
 {
     $errors = [];
