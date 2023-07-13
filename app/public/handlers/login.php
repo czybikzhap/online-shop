@@ -13,12 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (!empty($dbinfo['email']) && !(password_verify($dbinfo['password'], $hash))) {
         session_start();
         $_SESSION['id'] = ['id' => $dbinfo['id']];
+        //setcookie('user', $dbinfo['email'], time() + 3600);
         header('Location:./main');
     } else {
         $errors['password'] = 'неверное имя пользователя или пароль';
     }
 
 }
+
+//if (isset($_COOKIE['user'])) {
+   // header('Location: /main');
+//}
+require_once './views/login.phtml';
 function isValidLogin(array $data, PDO $conn): array
 {
     $errors = [];
@@ -42,4 +48,3 @@ function isValidLogin(array $data, PDO $conn): array
     return $errors;
 }
 
-require_once './views/login.phtml';
