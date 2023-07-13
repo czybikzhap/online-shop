@@ -13,8 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (!empty($dbinfo['email']) && !(password_verify($dbinfo['password'], $hash))) {
         session_start();
         $_SESSION['id'] = ['id' => $dbinfo['id']];
-        //setcookie('user', $dbinfo['email'], time() + 3600);
+        //setcookie('user', $dbinfo['email'], time() + 3600); //авторизация с помощью куки
         header('Location:./main');
+
     } else {
         $errors['password'] = 'неверное имя пользователя или пароль';
     }
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 }
 
 //if (isset($_COOKIE['user'])) {
-   // header('Location: /main');
+  // header('Location: /main');
 //}
 require_once './views/login.phtml';
 function isValidLogin(array $data, PDO $conn): array

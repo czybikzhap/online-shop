@@ -7,12 +7,12 @@
                 <div class="card-header">
                     Hit!
                 </div>
-                <img class="card-img-top" widht=400 height=300 src=<?php $product['image']?> alt="Card image">
+                <img class="card-img-top" widht=400 height=300 src=<?php echo $product['image']?> alt="Card image">
                 <div class="card-body">
                     <?php echo $product['productName'];?>
                     <a href="#"><h5 class="card-title"><?php echo $product['description'];?></h5></a>
                     <div class="card-footer">
-                        <?php echo $product['price']; ?>
+                        <?php echo ($product['price'] . ' руб'); ?>
                     </div>
                 </div>
             </a>
