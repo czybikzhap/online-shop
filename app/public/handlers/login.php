@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $errors = isValidLogin($_POST, $conn);
     if (!empty($dbinfo['email']) && !(password_verify($dbinfo['password'], $hash))) {
         session_start();
-        $_SESSION['id'] = ['id' => $dbinfo['id']];
+        $_SESSION['id'] = $dbinfo['id'];
         //setcookie('user', $dbinfo['email'], time() + 3600); //авторизация с помощью куки
         header('Location:./main');
 

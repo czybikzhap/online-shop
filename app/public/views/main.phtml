@@ -14,6 +14,10 @@
                     <div class="card-footer">
                         <?php echo ($product['price'] . ' руб'); ?>
                     </div>
+                    <form action="/addProduct" method="POST">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                        <input type="submit" value="Добавить в корзину">
+                    </form>
                 </div>
             </a>
         </div>
