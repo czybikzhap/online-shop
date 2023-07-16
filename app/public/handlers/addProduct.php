@@ -5,36 +5,37 @@ if (!isset($_SESSION['id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    print_r($_POST);
+    //print_r($_POST);
+    //echo '<br>';
     $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
     $products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
     //print_r($products);
 
     $userId = $_SESSION['id'];
     //print_r($userId);
+    //echo '<br>';
     $productId = $_POST['product_id'];
-    $amount = 1;
+    //print_r($productId);
+
 
     $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-    $dbBasketInfo = $conn->query("SELECT * FROM basket")->fetchAll(PDO::FETCH_ASSOC);
+    $dbBasketInfo = $conn->prepare("SELECT amount FROM basket WHERE user_id = :user_id AND 
+                                product_id = :product_id");
+    $dbBasketInfo->execute(['user_id' => $userId, 'product_id' => $productId]);
+    $amount = $dbBasketInfo->fetch();
+    print_r($amount);
 
-    print_r($dbBasketInfo);
-    if ($dbBasketInfo) {
-        $amount = $amount + 1;
-        $stmt = $conn->prepare("UPDATE basket SET amount = :amount WHERE user_id = :user_id AND
-        product_id = :product_id");
-        $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $amount]);
-    } else {
+    if (!isset($amount['amount'])) {
+        $amount = 1;
         $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount) 
         VALUES (:user_id, :product_id, :amount)");
         $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $amount]);
+    } else {
+        $amount = $amount['amount'] + 1;
+        $stmt = $conn->prepare("UPDATE basket SET amount = :amount WHERE user_id = :user_id AND
+        product_id = :product_id");
+        $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $amount]);
     }
-
-
-
-
-
-
 
 
     //$stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount)
