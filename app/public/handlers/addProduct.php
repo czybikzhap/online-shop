@@ -16,10 +16,23 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     //echo '<br>';
     $productId = $_POST['product_id'];
     //print_r($productId);
-
+    $amount = 1;
 
     $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-    $dbBasketInfo = $conn->prepare("SELECT amount FROM basket WHERE user_id = :user_id AND 
+    $basket = $conn->prepare("SELECT * FROM basket WHERE user_id = :user_id AND product_id = :product_id");
+    $basket->execute(['user_id' => $userId, 'product_id' => $productId]);
+    $basket = $basket->fetch();
+    $quantity = $basket['amount'];
+    //print_r($quantity);
+
+    $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount)
+        VALUES (:user_id, :product_id, :amount)
+        ON CONFLICT (user_id, product_id) DO UPDATE SET amount = :amount + EXCLUDED.amount");
+    $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $quantity]);
+
+
+    /*
+    $dbBasketInfo = $conn->prepare("SELECT amount FROM basket WHERE user_id = :user_id AND
                                 product_id = :product_id");
     $dbBasketInfo->execute(['user_id' => $userId, 'product_id' => $productId]);
     $amount = $dbBasketInfo->fetch();
@@ -27,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
     if (!isset($amount['amount'])) {
         $amount = 1;
-        $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount) 
+        $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount)
         VALUES (:user_id, :product_id, :amount)");
         $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $amount]);
     } else {
@@ -36,19 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         product_id = :product_id");
         $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $amount]);
     }
+*/
 
 
-    //$stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, amount)
-    //VALUES (:user_id, :product_id, :amount)
-    //ON CONFLICT (user_id, product_id) DO UPDATE SET amount = :amount + 1 ");
-    //$stmt->execute(['user_id' => $user_id, 'product_id' => $product_id, 'amount' => $amount]);
-
-    //$basket = $conn->query("SELECT * FROM basket ")->fetchAll(PDO::FETCH_ASSOC);
-
-    //print_r($basket);
 
 
-//require_once './handlers/main.php';
+require_once './handlers/main.php';
 }
 
 
