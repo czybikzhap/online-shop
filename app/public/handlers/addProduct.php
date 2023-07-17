@@ -8,27 +8,31 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     //print_r($_POST);
     //echo '<br>';
     $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-    $products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
-    print_r($products);
 
-    $userId = $_SESSION['id'];
-    //print_r($userId);
-    //echo '<br>';
-    $productId = $_POST['product_id'];
-    //print_r($productId);
-    $amount = 1;
+    //$products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
+    //print_r($products);
 
-    $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-    $basket = $conn->prepare("SELECT * FROM baskets WHERE user_id = :user_id AND product_id = :product_id");
-    $basket->execute(['user_id' => $userId, 'product_id' => $productId]);
-    $basket = $basket->fetch();
-    $quantity = $basket['amount'];
-    print_r($quantity);
+    $errors = isValidAddProduct($_POST, $conn);
 
-    $stmt = $conn->prepare("INSERT INTO baskets (user_id, product_id, amount)
+    if (empty($errors)) {
+        $userId = $_SESSION['id'];
+        //print_r($userId);
+        //echo '<br>';
+        $productId = $_POST['product_id'];
+        //print_r($productId);
+        $amount = 1;
+
+        $basket = $conn->prepare("SELECT * FROM baskets WHERE user_id = :user_id AND product_id = :product_id");
+        $basket->execute(['user_id' => $userId, 'product_id' => $productId]);
+        $basket = $basket->fetch();
+        $quantity = $basket['amount'];
+        print_r($quantity);
+
+        $stmt = $conn->prepare("INSERT INTO baskets (user_id, product_id, amount)
         VALUES (:user_id, :product_id, :amount)
         ON CONFLICT (user_id, product_id) DO UPDATE SET amount = :amount + EXCLUDED.amount");
-    $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $quantity]);
+        $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $quantity]);
+    }
 
 
     /*
@@ -55,6 +59,19 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
 
 require_once './handlers/main.php';
+}
+function isValidAddProduct(array $data, PDO $conn): array
+{
+    $errors = [];
+    if (!isset($data['product_id'])) {
+        $errors['product_id'] = 'product_id is required';
+    } else {
+        $productId = $data['product_id'];
+        if (empty($productId)) {
+            $errors['product_id'] = 'product_id не может быть пустым';
+        }
+    }
+    return $errors;
 }
 
 

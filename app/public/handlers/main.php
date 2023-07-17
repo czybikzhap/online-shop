@@ -9,7 +9,7 @@ if (!isset($_SESSION['id'])) {
 //print_r($_COOKIE['user']);
 $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
 $products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
-print_r($products);
+//print_r($products);
 
 require_once "./views/main.phtml";
 
