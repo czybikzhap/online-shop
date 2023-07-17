@@ -205,19 +205,11 @@ class UserController
             //echo '<br>';
             $productId = $_POST['product_id'];
             //print_r($productId);
-            $amount = 1;
-
-            $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-            $basket = $conn->prepare("SELECT * FROM baskets WHERE user_id = :user_id AND product_id = :product_id");
-            $basket->execute(['user_id' => $userId, 'product_id' => $productId]);
-            $basket = $basket->fetch();
-            $quantity = $basket['amount'];
-            print_r($quantity);
 
             $stmt = $conn->prepare("INSERT INTO baskets (user_id, product_id, amount)
-        VALUES (:user_id, :product_id, :amount)
-        ON CONFLICT (user_id, product_id) DO UPDATE SET amount = :amount + EXCLUDED.amount");
-            $stmt->execute(['user_id' => $userId, 'product_id' => $productId, 'amount' => $quantity]);
+                VALUES (:user_id, :product_id, 1)
+                ON CONFLICT (user_id, product_id) DO UPDATE SET amount = baskets.amount + EXCLUDED.amount");
+            $stmt->execute(['user_id' => $userId, 'product_id' => $productId]);
 
 
             /*

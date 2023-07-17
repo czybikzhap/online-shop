@@ -1,6 +1,6 @@
 <?php
 $requestUri = $_SERVER["REQUEST_URI"];
-
+/*
 if($requestUri === '/') {
     $object = new UserController();
     $object->main();
@@ -25,8 +25,8 @@ if($requestUri === '/') {
 } else {
     require_once '../View/notFound.html';
 }
-
-/*if($requestUri === '/') {
+*/
+if($requestUri === '/') {
         require_once './handlers/main.php';
     } elseif ($requestUri === '/signup') {
         require_once './handlers/signup.php';
@@ -43,7 +43,7 @@ if($requestUri === '/') {
     } else {
         require_once './views/notFound.html';
 }
-*/
+
 
 
 
