@@ -1,6 +1,7 @@
 <?php
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
     $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
 
     $errors = isValidSignUp($_POST, $conn);
