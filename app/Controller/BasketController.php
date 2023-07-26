@@ -1,5 +1,8 @@
 <?php
 
+use Model\AddProducts;
+use Model\Basket;
+
 class BasketController
 {
     public function basket()
@@ -9,20 +12,15 @@ class BasketController
             header('Location :/login');
         }
 
-        $userId = $_SESSION['id'];
+        require_once "../Model/Basket.php";
+        $basket = new Basket();
+        $basket = $basket->getBasket();
 
-        $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-        $basket = $conn->prepare("SELECT * FROM baskets WHERE user_id = :user_id");
-        $basket->execute(['user_id' => $userId]);
-        $basket = $basket->fetchAll();
-        //print_r($basket);
-        echo '<br>';
-        $products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
-        //print_r($products);
+
         require_once "../View/baskets.phtml";
     }
 
-    public function addProducts()
+    public function AddProducts()
     {
         session_start();
         if (!isset($_SESSION['id'])) {
@@ -30,25 +28,34 @@ class BasketController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
-            //print_r($_POST);
-            //echo '<br>';
-            $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
 
-            $userId = $_SESSION['id'];
-            //print_r($userId);
-            //echo '<br>';
-            $productId = $_POST['product_id'];
-            //print_r($productId);
+            $errors = $this->isValidAddProduct($_POST);
 
-            $stmt = $conn->prepare("INSERT INTO baskets (user_id, product_id, amount)
-                VALUES (:user_id, :product_id, 1)
-                ON CONFLICT (user_id, product_id) DO UPDATE SET amount = baskets.amount + EXCLUDED.amount");
-            $stmt->execute(['user_id' => $userId, 'product_id' => $productId]);
+            if(empty($errors)) {
+                require_once '../Model/AddProducts.php';
 
-            require_once '../Controller/MainController.php';
-            $object = new MainController();
-            $object->main();
+                $object = new AddProducts();
+                $basket = $object->AddProducts();
+
+                print_r($basket);
+            }
+
+            require_once "../View/baskets.phtml";
         }
+    }
+
+    private function isValidAddProduct(array $data): array
+    {
+        $errors = [];
+        if (!isset($data['product_id'])) {
+            $errors['product_id'] = 'product_id is required';
+        } else {
+            $productId = $data['product_id'];
+            if (empty($productId)) {
+                $errors['product_id'] = 'product_id не может быть пустым';
+            }
+        }
+        return $errors;
     }
 }
 

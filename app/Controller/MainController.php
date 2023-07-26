@@ -1,5 +1,7 @@
 <?php
 
+use Model\Main;
+
 class MainController
 {
 
@@ -10,10 +12,12 @@ class MainController
             header('Location :/login');
         }
 
-        $conn = new PDO('pgsql:host=db;dbname=dbname', 'dbuser', 'dbpwd');
-        $products = $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
+        require_once "../Model/Main.php";
+        $main = new Main();
+        $products = $main->getProducts();
 
-        require_once "./views/main.phtml";
+
+        require_once "../View/main.phtml";
     }
 
 }

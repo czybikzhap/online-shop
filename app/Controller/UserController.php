@@ -7,32 +7,29 @@ class UserController
     public function  login ()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
-            $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
 
-            $email = $_POST['email'];
-            $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-            $stmt->execute(['email' => $email]);
-            $dbinfo = $stmt->fetch();
-            $hash = $_POST['password'];
+            $errors = $this->isValidLogin($_POST);
 
-            $errors = $this->isValidLogin($_POST, $conn);
-            if (!empty($dbinfo['email']) && !(password_verify($dbinfo['password'], $hash))) {
-                session_start();
-                $_SESSION['id'] = $dbinfo['id'];
-                //setcookie('user', $dbinfo['email'], time() + 3600); //авторизация с помощью куки
-                header('Location:./main');
+            if (empty($errors)) {
+                require_once "../Model/User.php";
+                $user = new User();
+                $dbinfo = $user->getUser();
 
-            } else {
-                $errors['password'] = 'неверное имя пользователя или пароль';
+                $password = $_POST['password'];
+
+                if (!empty($dbinfo['email']) && (password_verify($password, $dbinfo['password']))) {
+                    session_start();
+                    $_SESSION['id'] = $dbinfo['id'];
+                    header('Location:./main');
+                } else {
+                    $errors['password'] = 'неверное имя пользователя или пароль';
+                }
             }
-
         }
-
-
         require_once '../View/login.phtml';
     }
 
-    private function isValidLogin(array $data, PDO $conn): array
+    private function isValidLogin(array $data): array
         {
             $errors = [];
             if (!isset($data['email'])) {
@@ -60,26 +57,14 @@ class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
 
-            $conn = new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
-
-            $errors = $this->isValidSignUp($_POST, $conn);
-
+            $errors = $this->isValidSignUp($_POST);
 
             if (empty($errors)) {
                 session_start();
 
-
-                $name = $_POST['name'];
-                $email = $_POST['email'];
-                $password = $_POST['password'];
-                $repeat_pwd = $_POST['repeat_pwd'];
-
-                $password = password_hash($password, PASSWORD_DEFAULT);
-                $data = ['name' => $name, 'email' => $email, 'password' => $password];
-
-
-                $user = new User;
-                $user->create($data);
+                require_once "../Model/User.php";
+                $user = new User();
+                $user->createUser();
 
                 header('Location: /login');
             }
@@ -87,11 +72,13 @@ class UserController
         require_once "../View/signup.phtml";
     }
 
-    private function isValidSignUp(array $data, PDO $conn): array
+    private function isValidSignUp(array $data): array
     {
         $errors = [];
 
-        if (!isset($data['name'])) $errors['name'] = 'name is required'; else {
+        if (!isset($data['name'])) {
+            $errors['name'] = 'name is required';
+        } else {
             $name = $data['name'];
             if (empty($name)) {
                 $errors['name'] = 'name не может быть пустым';
@@ -99,7 +86,6 @@ class UserController
                 $errors['name'] = 'name должен содержать больше 2-х символов';
             }
         }
-
 
         if (!isset($data['email'])) {
             $errors['email'] = 'email is required';
@@ -110,9 +96,10 @@ class UserController
             } elseif (strlen($email) < 2) {
                 $errors['email'] = 'email должен содержать больше 2-х символов';
             } else {
-                $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
-                $stmt->execute(['email' => $email]);
-                $userData = $stmt->fetch();
+                require_once "../Model/User.php";
+                $user = new User();
+                $userData = $user->getUser();
+
                 if (!empty($userData['email'])) {
                     $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
                 }
