@@ -1,6 +1,5 @@
 <?php
 
-use Model\AddProducts;
 use Model\Basket;
 
 class BasketController
@@ -33,9 +32,11 @@ class BasketController
 
             if(empty($errors)) {
                 require_once '../Model/Basket.php';
+                $userId = $_SESSION['id'];
+                $productId = $_POST['product_id'];
 
                 $object = new Basket();
-                $baskets = $object->AddProducts();
+                $baskets = $object->AddProducts($userId, $productId);
 
             }
 

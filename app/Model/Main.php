@@ -6,13 +6,20 @@ use PDO;
 
 class Main
 {
+    private PDO $conn;
+
+    public function __construct()
+    {
+        require_once "../Model/ConnectDB.php";
+        $this->conn = ConnectFactory::connectDB();
+    }
+
     public function getProducts (): array
     {
         require_once "../Model/ConnectDB.php";
-        $connect = new ConnectDB();
-        $conn = $connect->connectDB();
+        $conn = ConnectFactory::connectDB();
 
-        return $conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
+        return $this->conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
     }
 
 }

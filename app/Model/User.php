@@ -2,35 +2,32 @@
 
 namespace Model;
 
+use PDO;
+
 class User
 {
-    public function createUser(): array|false
+    private PDO $conn;
+
+    public function __construct()
     {
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        $password = password_hash($password, PASSWORD_DEFAULT);
         require_once "../Model/ConnectDB.php";
-        $connect = new ConnectDB();
-        $conn = $connect->connectDB();
+        $this->conn = ConnectFactory::connectDB();
+    }
 
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
-        $stmt->execute(['name' => $name, 'email' => $email, 'password' => $password]);
+    public function createUser(string $name, string $email, string $hash): array|false
+    {
+        $stmt= $this->conn->prepare("INSERT INTO users (name, email, password) 
+            VALUES (:name, :email, :password)");
+        $stmt->execute(['name' => $name, 'email' => $email, 'password' => $hash]);
 
         return $stmt->fetch();
     }
 
-    public function getUser(): array|false
+    public function getUser(string $email): array|false
     {
         require_once "../Model/ConnectDB.php";
 
-        $connect = new ConnectDB();
-        $conn = $connect->connectDB();
-
-        $email = $_POST['email'];
-
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email ");
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = :email ");
         $stmt->execute(['email' => $email]);
         return $stmt->fetch();
     }

@@ -4,10 +4,18 @@ namespace Model;
 
 use PDO;
 
-class ConnectDB
+class ConnectFactory
 {
-    public function connectDB(): PDO
+    private static PDO $conn;
+
+    public static function connectDB(): PDO
     {
-        return new PDO('pgsql:host=db; dbname=dbname', 'dbuser', 'dbpwd');
+        if (isset(static::$conn)) {
+            return static::$conn;
+        }
+        static::$conn = new PDO('pgsql:host=db; dbname=dbname',
+            'dbuser', 'dbpwd');
+
+        return static::$conn;
     }
 }

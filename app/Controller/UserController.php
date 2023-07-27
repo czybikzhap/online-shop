@@ -12,8 +12,12 @@ class UserController
 
             if (empty($errors)) {
                 require_once "../Model/User.php";
+
+
+                $email = $_POST['email'];
+
                 $user = new User();
-                $dbinfo = $user->getUser();
+                $dbinfo = $user->getUser($email);
 
                 $password = $_POST['password'];
 
@@ -62,9 +66,15 @@ class UserController
             if (empty($errors)) {
                 session_start();
 
+                $name = $_POST['name'];
+                $email = $_POST['email'];
+                $password = $_POST['password'];
+
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+
                 require_once "../Model/User.php";
                 $user = new User();
-                $user->createUser();
+                $user->createUser($name, $email, $hash);
 
                 header('Location: /login');
             }
@@ -98,7 +108,7 @@ class UserController
             } else {
                 require_once "../Model/User.php";
                 $user = new User();
-                $userData = $user->getUser();
+                $userData = $user->getUser($email);
 
                 if (!empty($userData['email'])) {
                     $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
