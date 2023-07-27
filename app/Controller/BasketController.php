@@ -16,12 +16,12 @@ class BasketController
         $basket = new Basket();
         $basket = $basket->getBasket();
 
-
         require_once "../View/baskets.phtml";
     }
 
-    public function AddProducts()
+    public function addProducts()
     {
+        $basket = array();
         session_start();
         if (!isset($_SESSION['id'])) {
             header('Location :/login');
@@ -32,15 +32,14 @@ class BasketController
             $errors = $this->isValidAddProduct($_POST);
 
             if(empty($errors)) {
-                require_once '../Model/AddProducts.php';
+                require_once '../Model/Basket.php';
 
-                $object = new AddProducts();
-                $basket = $object->AddProducts();
+                $object = new Basket();
+                $baskets = $object->AddProducts();
 
-                print_r($basket);
             }
 
-            require_once "../View/baskets.phtml";
+            require_once "../View/main.phtml";
         }
     }
 
