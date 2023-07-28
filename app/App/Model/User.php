@@ -33,4 +33,5 @@ class User
         $stmt->execute(['email' => $email]);
         return $stmt->fetch();
     }
+
 }

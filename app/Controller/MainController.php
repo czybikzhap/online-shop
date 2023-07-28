@@ -1,6 +1,8 @@
 <?php
 
-use Model\Main;
+namespace App\Controller;
+
+use App\Model\Main;
 
 class MainController
 {
@@ -12,10 +14,9 @@ class MainController
             header('Location :/login');
         }
 
-        require_once "../Model/Main.php";
-        $main = new Main();
+        $main = new Main(); //require_once "../Model/Main.php";
         $products = $main->getProducts();
-        print_r($products);
+        //print_r($products);
 
         require_once "../View/main.phtml";
     }

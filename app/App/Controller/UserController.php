@@ -9,13 +9,15 @@ class UserController
     public function  login ()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
             $errors = $this->isValidLogin($_POST);
 
             if (empty($errors)) {
+                //require_once "../Model/User.php";
 
                 $email = $_POST['email'];
 
-                $user = new User();  //require_once "../Model/User.php";
+                $user = new User();
                 $dbinfo = $user->getUser($email);
 
                 $password = $_POST['password'];
@@ -31,31 +33,37 @@ class UserController
         }
         require_once '../View/login.phtml';
     }
+
     private function isValidLogin(array $data): array
-    {
-        $errors = [];
-        if (!isset($data['email'])) {
-            $errors['email'] = 'email is required';
-        } else {
-            $email = $data['email'];
-            if (empty($email)) {
-                $errors['email'] = 'email не может быть пустым';
+        {
+            $errors = [];
+            if (!isset($data['email'])) {
+                $errors['email'] = 'email is required';
+            } else {
+                $email = $data['email'];
+                if (empty($email)) {
+                    $errors['email'] = 'email не может быть пустым';
+                }
             }
-        }
-        if (!isset($data['password'])){
-            $errors['password'] = 'password is required';
-        } else {
-            $password = $data['password'];
-            if (empty($password)) {
-                $errors['password'] = 'password не может быть пустым';
+            if (!isset($data['password'])){
+                $errors['password'] = 'password is required';
+            } else {
+                $password = $data['password'];
+                if (empty($password)) {
+                    $errors['password'] = 'password не может быть пустым';
+                }
             }
+
+            return $errors;
         }
-        return $errors;
-    }
+
+
     public function signup ()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
             $errors = $this->isValidSignUp($_POST);
+
             if (empty($errors)) {
                 session_start();
 
@@ -65,7 +73,7 @@ class UserController
 
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                $user = new User(); //require_once "../Model/User.php";
+                $user = new User();
                 $user->createUser($name, $email, $hash);
 
                 header('Location: /login');
@@ -73,9 +81,11 @@ class UserController
         }
         require_once "../View/signup.phtml";
     }
+
     private function isValidSignUp(array $data): array
     {
         $errors = [];
+
         if (!isset($data['name'])) {
             $errors['name'] = 'name is required';
         } else {
@@ -86,6 +96,7 @@ class UserController
                 $errors['name'] = 'name должен содержать больше 2-х символов';
             }
         }
+
         if (!isset($data['email'])) {
             $errors['email'] = 'email is required';
         } else {
@@ -95,7 +106,9 @@ class UserController
             } elseif (strlen($email) < 2) {
                 $errors['email'] = 'email должен содержать больше 2-х символов';
             } else {
-                $user = new User(); //require_once "../Model/User.php";
+                //$model = new User(); //require_once "../Model/User.php";
+                //require_once "../Model/User.php";
+                $user = new User();
                 $userData = $user->getUser($email);
 
                 if (!empty($userData['email'])) {
@@ -103,6 +116,7 @@ class UserController
                 }
             }
         }
+
         if (!isset($data['password'])) {
             $errors['password'] = 'password is required';
         } else {
@@ -113,6 +127,7 @@ class UserController
                 $errors['password'] = 'password должен содержать больше 2-х символов';
             }
         }
+
         if (!isset($data['repeat_pwd'])) {
             $errors['repeat_pwd'] = 'password is required';
         } else {
@@ -125,9 +140,15 @@ class UserController
         }
         return $errors;
     }
+
+
+
     public function logout ()
     {
         session_start();
         unset($_SESSION['user']);
+
     }
+
+
 }

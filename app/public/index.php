@@ -1,32 +1,45 @@
 <?php
+
 $requestUri = $_SERVER["REQUEST_URI"];
 
-if($requestUri === '/') {
-    require_once '../Controller/MainController.php';
+spl_autoload_register(function ($class) {
+    $path = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
+    $appRoot = dirname(__DIR__);
+    $path = preg_replace('#^App#', $appRoot, $path);
+
+    if (file_exists($path)) {
+        require_once $path;
+        return true;
+    }
+
+    return false;
+});
+
+
+use App\Controller\BasketController;
+use App\Controller\MainController;
+use App\Controller\UserController;
+
+if ($requestUri === '/') {
     $object = new MainController();
     $object->main();
 } elseif ($requestUri === '/signup') {
-    require_once '../Controller/UserController.php';
     $object = new UserController();
     $object->signup();
 } elseif ($requestUri === '/login') {
-    require_once '../Controller/UserController.php';
     $object = new UserController();
     $object->login();
 } elseif ($requestUri === '/main') {
-    require_once '../Controller/MainController.php';
     $object = new MainController();
     $object->main();
 } elseif ($requestUri === '/basket') {
-    require_once '../Controller/BasketController.php';
     $object = new BasketController();
     $object->basket();
-}elseif ($requestUri === '/addProduct') {
-    require_once '../Controller/BasketController.php';
+} elseif ($requestUri === '/addProduct') {
     $object = new BasketController();
     $object->addProducts();
 } elseif ($requestUri === '/logout') {
-    require_once '../Controller/UserController.php';
     $object = new UserController();
     $object->logout();
 } else {

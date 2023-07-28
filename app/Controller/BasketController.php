@@ -1,6 +1,8 @@
 <?php
 
-use Model\Basket;
+namespace App\Controller;
+
+use App\Model\Basket;
 
 class BasketController
 {
@@ -11,8 +13,7 @@ class BasketController
             header('Location :/login');
         }
 
-        require_once "../Model/Basket.php";
-        $basket = new Basket();
+        $basket = new Basket();  //require_once "../Model/Basket.php";
         $basket = $basket->getBasket();
 
         require_once "../View/baskets.phtml";
@@ -31,11 +32,11 @@ class BasketController
             $errors = $this->isValidAddProduct($_POST);
 
             if(empty($errors)) {
-                require_once '../Model/Basket.php';
+
                 $userId = $_SESSION['id'];
                 $productId = $_POST['product_id'];
 
-                $object = new Basket();
+                $object = new Basket(); //require_once '../Model/Basket.php';
                 $baskets = $object->AddProducts($userId, $productId);
 
             }

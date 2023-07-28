@@ -1,6 +1,8 @@
 <?php
 
-namespace Model;
+namespace App\Model;
+
+use Model\ConnectFactory;
 
 use PDO;
 
@@ -10,7 +12,7 @@ class Basket
 
     public function __construct()
     {
-        require_once "../Model/ConnectDB.php";
+        require_once "../Model/ConnectFactory.php";
         $this->conn = ConnectFactory::connectDB();
     }
 
