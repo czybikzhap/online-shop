@@ -22,7 +22,14 @@ if (isset($routes[$requestUri])) {
     list($class, $method) = $routes[$requestUri];
 
     $obj = new $class();
-    $obj->$method();
+    $result = $obj->$method();
+
+    $viewName = $result['view'];
+    $data = $result['data'];
+
+    extract($data);
+
+    require_once "./../View/$viewName.phtml";
 } else {
     require_once '../View/notFound.html';
 };

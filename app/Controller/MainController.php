@@ -22,9 +22,14 @@ class MainController
         }
 
         $products = $this->mainModel->getProducts();
-        print_r($products);
+        //print_r($products);
 
-        require_once "../View/main.phtml";
+        return [
+            'view' => 'main',
+            'data' => [
+                'products' => $products
+            ]
+        ];
     }
 
 }

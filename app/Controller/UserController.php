@@ -13,8 +13,9 @@ class UserController
         $this->userModel = new User();
     }
 
-    public function  login ()
+    public function  login (): array
     {
+        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $errors = $this->isValidLogin($_POST);
 
@@ -34,7 +35,12 @@ class UserController
                 }
             }
         }
-        require_once '../View/login.phtml';
+        return [
+            'view' => 'login',
+            'data' => [
+                'errors' => $errors
+            ]
+        ];
     }
     private function isValidLogin(array $data): array
     {
@@ -57,7 +63,7 @@ class UserController
         }
         return $errors;
     }
-    public function signup ()
+    public function signup (): array
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $errors = $this->isValidSignUp($_POST);
@@ -75,7 +81,12 @@ class UserController
                 header('Location: /login');
             }
         }
-        require_once "../View/signup.phtml";
+        return [
+            'view' => 'signup',
+            'data' => [
+                'errors' => $errors
+            ]
+        ];
     }
     private function isValidSignUp(array $data): array
     {
@@ -127,7 +138,7 @@ class UserController
         }
         return $errors;
     }
-    public function logout ()
+    public function logout (): void
     {
         session_start();
         unset($_SESSION['id']);

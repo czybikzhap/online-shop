@@ -13,7 +13,7 @@ class BasketController
         $this->basketModel = new Basket();
     }
 
-    public function basket(): void
+    public function basket()
     {
         session_start();
         if (!isset($_SESSION['id'])) {
@@ -22,7 +22,12 @@ class BasketController
 
         $basket = $this->basketModel->getBasket();
 
-        require_once "../View/baskets.phtml";
+        return [
+            'view' => 'baskets',
+            'data' => [
+                'basket' => $basket,
+            ]
+        ];
     }
 
     public function addProducts(): void
@@ -46,8 +51,6 @@ class BasketController
                 $this->basketModel->AddProducts($userId, $productId);
 
             }
-
-//            require_once "../View/main.phtml";
         }
     }
 
