@@ -6,6 +6,13 @@ use App\Model\Main;
 
 class MainController
 {
+    private Main $mainModel;
+
+    public function __construct()
+    {
+        $this->mainModel = new Main();
+    }
+
 
     public function main()
     {
@@ -14,9 +21,8 @@ class MainController
             header('Location :/login');
         }
 
-        $main = new Main(); //require_once "../Model/Main.php";
-        $products = $main->getProducts();
-        //print_r($products);
+        $products = $this->mainModel->getProducts();
+        print_r($products);
 
         require_once "../View/main.phtml";
     }

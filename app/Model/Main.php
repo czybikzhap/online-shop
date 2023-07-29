@@ -18,9 +18,6 @@ class Main
 
     public function getProducts (): array
     {
-        require_once "../Model/ConnectFactory.php";
-        $conn = ConnectFactory::connectDB();
-
         return $this->conn->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
     }
 

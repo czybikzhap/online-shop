@@ -6,6 +6,13 @@ use App\Model\User;
 
 class UserController
 {
+    private User $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+
     public function  login ()
     {
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
@@ -15,11 +22,9 @@ class UserController
 
                 $email = $_POST['email'];
 
-                $user = new User();  //require_once "../Model/User.php";
-                $dbinfo = $user->getUser($email);
+                $dbinfo = $this->userModel->getUser($email);
 
                 $password = $_POST['password'];
-
                 if (!empty($dbinfo['email']) && (password_verify($password, $dbinfo['password']))) {
                     session_start();
                     $_SESSION['id'] = $dbinfo['id'];
@@ -65,8 +70,7 @@ class UserController
 
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                $user = new User(); //require_once "../Model/User.php";
-                $user->createUser($name, $email, $hash);
+                $this->userModel->createUser($name, $email, $hash);
 
                 header('Location: /login');
             }
@@ -95,9 +99,7 @@ class UserController
             } elseif (strlen($email) < 2) {
                 $errors['email'] = 'email должен содержать больше 2-х символов';
             } else {
-                $user = new User(); //require_once "../Model/User.php";
-                $userData = $user->getUser($email);
-
+                $userData = $this->userModel->getUser($email);
                 if (!empty($userData['email'])) {
                     $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
                 }

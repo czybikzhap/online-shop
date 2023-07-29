@@ -6,25 +6,32 @@ use App\Model\Basket;
 
 class BasketController
 {
-    public function basket()
+    private Basket $basketModel;
+
+    public function __construct()
+    {
+        $this->basketModel = new Basket();
+    }
+
+    public function basket(): void
     {
         session_start();
         if (!isset($_SESSION['id'])) {
             header('Location :/login');
         }
 
-        $basket = new Basket();  //require_once "../Model/Basket.php";
-        $basket = $basket->getBasket();
+        $basket = $this->basketModel->getBasket();
 
         require_once "../View/baskets.phtml";
     }
 
-    public function addProducts()
+    public function addProducts(): void
     {
-        $basket = array();
         session_start();
         if (!isset($_SESSION['id'])) {
             header('Location :/login');
+        } else {
+            header("Location: /main");
         }
 
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
@@ -36,12 +43,11 @@ class BasketController
                 $userId = $_SESSION['id'];
                 $productId = $_POST['product_id'];
 
-                $object = new Basket(); //require_once '../Model/Basket.php';
-                $baskets = $object->AddProducts($userId, $productId);
+                $this->basketModel->AddProducts($userId, $productId);
 
             }
 
-            require_once "../View/main.phtml";
+//            require_once "../View/main.phtml";
         }
     }
 
@@ -59,5 +65,3 @@ class BasketController
         return $errors;
     }
 }
-
-
