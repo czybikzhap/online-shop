@@ -16,35 +16,46 @@ spl_autoload_register(function ($class) {
     return false;
 });
 
+$routes = require_once './../config/routes.php';
 
-use App\Controller\BasketController;
-use App\Controller\MainController;
-use App\Controller\UserController;
+if (isset($routes[$requestUri])) {
+    list($class, $method) = $routes[$requestUri];
 
-if ($requestUri === '/') {
-    $object = new MainController();
-    $object->main();
-} elseif ($requestUri === '/signup') {
-    $object = new UserController();
-    $object->signup();
-} elseif ($requestUri === '/login') {
-    $object = new UserController();
-    $object->login();
-} elseif ($requestUri === '/main') {
-    $object = new MainController();
-    $object->main();
-} elseif ($requestUri === '/basket') {
-    $object = new BasketController();
-    $object->basket();
-} elseif ($requestUri === '/addProduct') {
-    $object = new BasketController();
-    $object->addProducts();
-} elseif ($requestUri === '/logout') {
-    $object = new UserController();
-    $object->logout();
+    $obj = new $class();
+    $obj->$method();
 } else {
     require_once '../View/notFound.html';
-}
+};
+
+
+//use App\Controller\BasketController;
+//use App\Controller\MainController;
+//use App\Controller\UserController;
+//
+//if ($requestUri === '/') {
+//    $object = new MainController();
+//    $object->main();
+//} elseif ($requestUri === '/signup') {
+//    $object = new UserController();
+//    $object->signup();
+//} elseif ($requestUri === '/login') {
+//    $object = new UserController();
+//    $object->login();
+//} elseif ($requestUri === '/main') {
+//    $object = new MainController();
+//    $object->main();
+//} elseif ($requestUri === '/basket') {
+//    $object = new BasketController();
+//    $object->basket();
+//} elseif ($requestUri === '/addProduct') {
+//    $object = new BasketController();
+//    $object->addProducts();
+//} elseif ($requestUri === '/logout') {
+//    $object = new UserController();
+//    $object->logout();
+//} else {
+//    require_once '../View/notFound.html';
+//}
 
 /*
 if($requestUri === '/') {
