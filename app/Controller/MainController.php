@@ -14,7 +14,7 @@ class MainController
     }
 
 
-    public function main()
+    public function main(): array
     {
         session_start();
         if (!isset($_SESSION['id'])) {

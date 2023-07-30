@@ -6,13 +6,6 @@ use App\Model\User;
 
 class UserController
 {
-    private User $userModel;
-
-    public function __construct()
-    {
-        $this->userModel = new User();
-    }
-
     public function  login (): array
     {
         $errors = [];
@@ -23,12 +16,12 @@ class UserController
 
                 $email = $_POST['email'];
 
-                $dbinfo = $this->userModel->getUser($email);
+                $user = User::getUser($email);
 
                 $password = $_POST['password'];
-                if (!empty($dbinfo['email']) && (password_verify($password, $dbinfo['password']))) {
+                if (!empty($user) && (password_verify($password, $user->getPassword()))) {
                     session_start();
-                    $_SESSION['id'] = $dbinfo['id'];
+                    $_SESSION['id'] = $user->getUserId();
                     header('Location:./main');
                 } else {
                     $errors['password'] = 'неверное имя пользователя или пароль';
@@ -76,7 +69,9 @@ class UserController
 
                 $hash = password_hash($password, PASSWORD_DEFAULT);
 
-                $this->userModel->createUser($name, $email, $hash);
+                $user = new User($name, $email, $hash);
+
+                $user->createUser();
 
                 header('Location: /login');
             }
@@ -110,8 +105,8 @@ class UserController
             } elseif (strlen($email) < 2) {
                 $errors['email'] = 'email должен содержать больше 2-х символов';
             } else {
-                $userData = $this->userModel->getUser($email);
-                if (!empty($userData['email'])) {
+                $userData = User::getUser($email);
+                if (!empty($userData)) {
                     $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
                 }
             }
