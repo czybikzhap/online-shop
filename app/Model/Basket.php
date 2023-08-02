@@ -2,39 +2,58 @@
 
 namespace App\Model;
 
-use Model\ConnectFactory;
-
 use PDO;
 
 class Basket
 {
+    private int $id;
+    private int $userId;
+    private int $productId;
+
     private PDO $conn;
 
-    public function __construct()
+    public function __construct(int $userId, int $productId)
     {
-        require_once "../Model/ConnectFactory.php";
+        $this->userId = $userId;
+        $this->productId = $productId;
+
         $this->conn = ConnectFactory::connectDB();
     }
 
-    public function getBasket ()
+    public static function getBasket (int $userId): array|null
     {
-        $userId = $_SESSION['id'];
-        echo $userId;
+        $stmt = ConnectFactory::connectDB()->prepare("SELECT * FROM baskets 
+         WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $userId]);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $basket = $this->conn->prepare("SELECT * FROM baskets WHERE user_id = :user_id");
-        $basket->execute(['user_id' => $userId]);
-        return $basket->fetchAll(PDO::FETCH_ASSOC);
+        if (!$data) {
+            return null;
+        }
+
+        return $data;
     }
 
-    public function AddProducts(int $userId, int $productId): void
+
+    public function AddProducts(): array
     {
         $stmt = $this->conn->prepare("INSERT INTO baskets (user_id, product_id, amount)
             VALUES (:user_id, :product_id, 1)
             ON CONFLICT (user_id, product_id) 
             DO UPDATE SET amount = baskets.amount + EXCLUDED.amount");
-        $stmt->execute(['user_id' => $userId, 'product_id' => $productId]);
-        //return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->execute(['user_id' => $this->userId, 'product_id' => $this->productId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     }
+
+//    public function setBasketId(int $id): int
+//    {
+//        return $this->id = $id;
+//    }
+//    public function getBasketId(): int
+//    {
+//        return $this->id;
+//    }
+
 
 }

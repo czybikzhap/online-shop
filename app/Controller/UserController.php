@@ -15,10 +15,10 @@ class UserController
             if (empty($errors)) {
 
                 $email = $_POST['email'];
+                $password = $_POST['password'];
 
                 $user = User::getUser($email);
 
-                $password = $_POST['password'];
                 if (!empty($user) && (password_verify($password, $user->getPassword()))) {
                     session_start();
                     $_SESSION['id'] = $user->getUserId();
@@ -105,7 +105,8 @@ class UserController
             } elseif (strlen($email) < 2) {
                 $errors['email'] = 'email должен содержать больше 2-х символов';
             } else {
-                $userData = User::getUser($email);
+                $user = new User( $_POST['name'],  $email, $_POST['password']);
+                $userData = $user->getUser($email);
                 if (!empty($userData)) {
                     $errors['email'] = 'пользователь с таким адресом электронной почты уже зарегистрирован';
                 }

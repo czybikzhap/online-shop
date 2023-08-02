@@ -2,13 +2,11 @@
 
 namespace App\Model;
 
-use Model\ConnectFactory;
-
 use PDO;
 
 class User
 {
-    private static string $id;
+    private int $id;
     private string $name;
     private string $email;
     private string $hash;
@@ -20,9 +18,6 @@ class User
         $this->name = $name;
         $this->email = $email;
         $this->hash = $hash;
-
-        require_once "../Model/ConnectFactory.php";
-        $this->conn = ConnectFactory::connectDB();
     }
 
     public function createUser(): array|false
@@ -36,19 +31,16 @@ class User
 
     public static function getUser(string $email): User|null
     {
-        require_once "../Model/ConnectFactory.php";
-
         $stmt = ConnectFactory::connectDB()->prepare("SELECT * FROM users WHERE email = :email ");
         $stmt->execute(['email' => $email]);
         $data = $stmt->fetch();
-
-        self::$id = $data['id'];
 
         if (!$data) {
             return null;
         }
 
         $user = new User($data['name'], $data['email'], $data['password']);
+        $user->setUserId($data['id']);
 
         return $user;
     }
@@ -58,9 +50,14 @@ class User
         return $this->hash;
     }
 
-    public function getUserId(): string
+    public function setUserId(int $id): int
     {
-        return self::$id;
+        return $this->id = $id;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->id;
     }
 
 }

@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Model\Main;
+use App\Model\Products;
 
 class MainController
 {
-    private Main $mainModel;
-
-    public function __construct()
-    {
-        $this->mainModel = new Main();
-    }
+//    private Products $mainModel;
+//
+//    public function __construct()
+//    {
+//        $this->mainModel = new Products();
+//    }
 
 
     public function main(): array
@@ -21,7 +21,7 @@ class MainController
             header('Location :/login');
         }
 
-        $products = $this->mainModel->getProducts();
+        $products = Products::getProducts();
         //print_r($products);
 
         return [

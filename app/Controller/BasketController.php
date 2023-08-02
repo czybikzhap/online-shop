@@ -6,21 +6,16 @@ use App\Model\Basket;
 
 class BasketController
 {
-    private Basket $basketModel;
 
-    public function __construct()
-    {
-        $this->basketModel = new Basket();
-    }
-
-    public function basket()
+    public function basket(): array
     {
         session_start();
         if (!isset($_SESSION['id'])) {
             header('Location :/login');
         }
+        $userId = $_SESSION['id'];
 
-        $basket = $this->basketModel->getBasket();
+        $basket = Basket::getBasket($userId);
 
         return [
             'view' => 'baskets',
@@ -48,7 +43,8 @@ class BasketController
                 $userId = $_SESSION['id'];
                 $productId = $_POST['product_id'];
 
-                $this->basketModel->AddProducts($userId, $productId);
+                $addProduct = new Basket($userId, $productId);
+                $addProduct->AddProducts();
 
             }
         }
