@@ -49,6 +49,36 @@ class BasketController
             }
         }
     }
+    public function delete(): void
+    {
+        session_start();
+        if (!isset($_SESSION['id'])) {
+            header('Location: /login');
+        } else {
+            header('Location: /basket');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
+            Basket::delete($_SESSION['id']);
+        }
+    }
+
+    public function deleteProduct(): void
+    {
+        session_start();
+        if (!isset($_SESSION['id'])) {
+            header('Location: /login');
+        } else {
+            header('Location: /basket');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === "POST") {
+            print_r($_POST);
+            Basket::deleteProduct($_SESSION['id'], $_POST['product_id']);
+
+        }
+    }
 
     private function isValidAddProduct(array $data): array
     {

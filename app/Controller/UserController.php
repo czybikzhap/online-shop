@@ -58,7 +58,9 @@ class UserController
     }
     public function signup (): array
     {
+        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] === "POST") {
+
             $errors = $this->isValidSignUp($_POST);
             if (empty($errors)) {
                 session_start();

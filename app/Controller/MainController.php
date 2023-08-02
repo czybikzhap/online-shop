@@ -6,13 +6,6 @@ use App\Model\Products;
 
 class MainController
 {
-//    private Products $mainModel;
-//
-//    public function __construct()
-//    {
-//        $this->mainModel = new Products();
-//    }
-
 
     public function main(): array
     {

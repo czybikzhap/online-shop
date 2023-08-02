@@ -12,7 +12,7 @@ class Basket
 
     private PDO $conn;
 
-    public function __construct(int $userId, int $productId)
+    public function __construct(int $userId, $productId)
     {
         $this->userId = $userId;
         $this->productId = $productId;
@@ -45,15 +45,19 @@ class Basket
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     }
+    public static function delete (int $userId): void
+    {
+        $stmt = ConnectFactory::connectDB()->prepare('DELETE FROM baskets 
+       WHERE user_id = :user_id');
+        $stmt->execute(['user_id' => $userId]);
+    }
 
-//    public function setBasketId(int $id): int
-//    {
-//        return $this->id = $id;
-//    }
-//    public function getBasketId(): int
-//    {
-//        return $this->id;
-//    }
+    public static function deleteProduct($userId, $productId): void
+    {
+        $stmt = ConnectFactory::connectDB()->prepare('DELETE FROM baskets 
+       WHERE user_id = :user_id AND product_id = :product_id');
+        $stmt->execute(['user_id' => $userId, 'product_id' => $productId]);
+    }
 
 
 }

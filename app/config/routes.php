@@ -11,5 +11,7 @@ return [
     '/basket' => [BasketController::class, 'basket'],
     '/addProduct' => [BasketController::class, 'addProducts'],
     '/logout' => [UserController::class, 'logout'],
+    '/deleteProduct' => [BasketController::class, 'deleteProduct'],
+    '/delete' => [BasketController::class, 'delete']
 
 ];

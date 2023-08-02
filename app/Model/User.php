@@ -11,7 +11,6 @@ class User
     private string $email;
     private string $hash;
 
-    private PDO $conn;
 
     public function __construct(string $name, string $email, string $hash)
     {
@@ -22,7 +21,7 @@ class User
 
     public function createUser(): array|false
     {
-        $stmt = $this->conn->prepare("INSERT INTO users (name, email, password) 
+        $stmt = ConnectFactory::connectDB()->prepare("INSERT INTO users (name, email, password) 
             VALUES (:name, :email, :password)");
         $stmt->execute(['name' => $this->name, 'email' => $this->email, 'password' => $this->hash]);
 
