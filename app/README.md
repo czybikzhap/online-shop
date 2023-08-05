@@ -1,6 +1,7 @@
+
  <h1 align="center">Сервис "Online shop"</h1> 
  
-* Этот проект реализован с помощью PHP 8.0 , PostgreSql и Nginx.
+* Этот проект реализован с помощью **PHP 8.0**, **PostgreSql** и **Nginx**.
 
 
 <!-- ABOUT THE PROJECT -->
